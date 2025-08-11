@@ -173,22 +173,21 @@ const RequisitionForm = () => {
       setSuccess(true);
       resetForm();
       setTimeout(() => setSuccess(false), 3000);
-      console.log("Requisition submitted to Firebase:", requisitionData);
+      setShowPrintModal(false); // Close modal on success
     } catch (error: any) {
       console.error("Error submitting requisition:", error);
       
       // Handle specific PR/JO conflict
       if (error.message === "PR_JO_CONFLICT") {
-        setSubmitError(`
-          PR/JO number is already existing. 
-          Please refresh your page to get the latest PR/JO number.
-        `);
+        setSubmitError(
+          "PR/JO number is already existing. Please refresh your page to get the latest PR/JO number."
+        );
       } else {
         setSubmitError(`Submission failed: ${error.message}`);
+        setShowPrintModal(false); // Close modal for other errors
       }
     } finally {
       setIsSubmitting(false);
-      setShowPrintModal(false);
     }
   };
 
@@ -300,9 +299,9 @@ const RequisitionForm = () => {
             {submitError.includes("already existing") ? (
               <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
                 <p className="font-semibold">PR/JO Number Conflict</p>
-                <p>{submitError}</p>
+                <p className="mb-3">{submitError}</p>
                 <Button
-                  className="mt-3"
+                  className="w-full"
                   onClick={() => window.location.reload()}
                 >
                   Refresh Page Now
@@ -313,22 +312,28 @@ const RequisitionForm = () => {
                 {submitError}
               </div>
             ) : (
-              <p className="mb-4">
-                Please print a copy using Ctrl + P inside the requisition forms for your records before submitting.
-                Note: The IT Department will not reprint any document that is sent without printing.
+              <p className="mb-4 text-red-600 font-bold">
+                ⚠️ IMPORTANT — PLEASE READ BEFORE SUBMITTING ⚠️<br /><br />
+                Please print a copy of your requisition form using <strong>Ctrl + P</strong> before submitting.<br />
+                The <strong>IT Department will NOT reprint</strong> any document once submitted.<br />
+                Double-check all entries — the <strong>PR/JO number must always be unique</strong>.<br />
+                Any duplicate or incorrect information is the sole responsibility of the submitter.
               </p>
             )}
             
-            <div className="flex justify-end gap-3">
+            <div className="flex justify-end gap-3 mt-4">
               <Button 
                 variant="outline" 
-                onClick={() => setShowPrintModal(false)}
+                onClick={() => {
+                  setSubmitError("");
+                  setShowPrintModal(false);
+                }}
                 disabled={isSubmitting}
               >
                 Cancel
               </Button>
               
-              {/* Disable submit button for PR/JO conflicts */}
+              {/* Only show submit button if no PR/JO conflict */}
               {!submitError.includes("already existing") && (
                 <Button 
                   onClick={submitToFirebase}
