@@ -147,8 +147,9 @@ const RequisitionForm = () => {
       const docRef = doc(db, "requisitions", docId);
       const docSnap = await getDoc(docRef);
 
+      // PR/JO conflict detection
       if (docSnap.exists()) {
-        throw new Error("PR/JO number already exists. Please generate a new form.");
+        throw new Error("PR_JO_CONFLICT");
       }
 
       // Filter out empty items
@@ -175,7 +176,16 @@ const RequisitionForm = () => {
       console.log("Requisition submitted to Firebase:", requisitionData);
     } catch (error: any) {
       console.error("Error submitting requisition:", error);
-      setSubmitError(`Submission failed: ${error.message}`);
+      
+      // Handle specific PR/JO conflict
+      if (error.message === "PR_JO_CONFLICT") {
+        setSubmitError(`
+          PR/JO number is already existing. 
+          Please refresh your page to get the latest PR/JO number.
+        `);
+      } else {
+        setSubmitError(`Submission failed: ${error.message}`);
+      }
     } finally {
       setIsSubmitting(false);
       setShowPrintModal(false);
@@ -285,14 +295,27 @@ const RequisitionForm = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg max-w-md w-full">
             <h3 className="font-bold text-lg mb-4">Confirm Submission</h3>
-            <p className="mb-4">
-              Please print a copy of this requisition for your records before submitting.
-            </p>
             
-            {submitError && (
+            {/* PR/JO Conflict Error */}
+            {submitError.includes("already existing") ? (
+              <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
+                <p className="font-semibold">PR/JO Number Conflict</p>
+                <p>{submitError}</p>
+                <Button
+                  className="mt-3"
+                  onClick={() => window.location.reload()}
+                >
+                  Refresh Page Now
+                </Button>
+              </div>
+            ) : submitError ? (
               <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
                 {submitError}
               </div>
+            ) : (
+              <p className="mb-4">
+                Please print a copy of this requisition for your records before submitting.
+              </p>
             )}
             
             <div className="flex justify-end gap-3">
@@ -303,12 +326,16 @@ const RequisitionForm = () => {
               >
                 Cancel
               </Button>
-              <Button 
-                onClick={submitToFirebase}
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? "Submitting..." : "Already Printed, Submit"}
-              </Button>
+              
+              {/* Disable submit button for PR/JO conflicts */}
+              {!submitError.includes("already existing") && (
+                <Button 
+                  onClick={submitToFirebase}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Submitting..." : "Already Printed, Submit"}
+                </Button>
+              )}
             </div>
           </div>
         </div>
