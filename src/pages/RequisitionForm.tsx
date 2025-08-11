@@ -314,7 +314,8 @@ const RequisitionForm = () => {
               </div>
             ) : (
               <p className="mb-4">
-                Please print a copy of this requisition for your records before submitting.
+                Please print a copy using Ctrl + P inside the requisition forms for your records before submitting.
+                Note: The IT Department will not reprint any document that is sent without printing.
               </p>
             )}
             
