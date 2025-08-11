@@ -46,6 +46,7 @@ function Home() {
                   </li>
                   <li>Keep a physical copy for your records if needed</li>
                   <li>After printing, click "Submit" in the system</li>
+                  <li>This is solely for data collection.</li>
                 </ol>
               </div>
             </div>
