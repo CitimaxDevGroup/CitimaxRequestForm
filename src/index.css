@@ -76,7 +76,7 @@
   }
 @media print {
   @page {
-    size: 13in 8.5in;
+    size: A5;
     margin: 0;
   }
 
@@ -89,8 +89,8 @@
   }
 
   .container {
-    width: 13in !important;
-    min-height: 8.5in !important;
+    width: 148mm !important;  /* A5 width */
+    min-height: 210mm !important; /* A5 height */
     padding: 5mm !important;
     margin: 0 !important;
     transform: scale(1.0);
@@ -101,19 +101,32 @@
     display: none !important;
   }
 
-  /* ✅ Keep date input visible */
   input[name="date"],
   .show-on-print {
     display: inline-block !important;
     visibility: visible !important;
   }
 
-  .border-b {
-    border-bottom: 1px solid black !important;
+  /* Keep all borders but make them lighter */
+  .border,
+  .border-gray-800 {
+    border-color: #ccc !important; /* Light gray */
   }
 
-  .border {
-    border: 1px solid black !important;
+  /* Table borders slightly darker for visibility */
+  table,
+  th,
+  td {
+    border: 1px solid #aaa !important;
+    border-collapse: collapse;
+  }
+
+  /* Remove all input borders inside the form/table when printing */
+  .form-container input,
+  .form-container .border-b,
+  .form-container input[type="text"],
+  .form-container input[type="number"] {
+    border: none !important;
   }
 
   .card-header {
@@ -122,8 +135,6 @@
   }
 
   input {
-    border: none !important;
-    border-bottom: 1px solid #000 !important;
     border-radius: 0 !important;
     padding: 0 !important;
     background: transparent !important;
@@ -134,12 +145,10 @@
 
   table {
     width: 100% !important;
-    border-collapse: collapse;
     font-size: 9pt !important;
   }
 
   th, td {
-    border: 1px solid #000 !important;
     padding: 1mm 1.5mm !important;
     line-height: 1.2;
   }
@@ -179,7 +188,6 @@
     padding-bottom: 1mm !important;
   }
 
-  /* ✅ Hide only interactive elements, not date */
   button, .popover, .calendar-button {
     display: none !important;
   }
@@ -203,3 +211,4 @@
     letter-spacing: -0.5px;
   }
 }
+

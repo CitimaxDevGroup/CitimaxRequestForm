@@ -11,7 +11,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { format } from "date-fns";
-import { CalendarIcon, Download, Plus, Trash } from "lucide-react";
+import { CalendarIcon, Plus, Trash, Printer } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ItemTable, { Item } from "@/components/requisition/ItemTable";
 import jsPDF from "jspdf";
@@ -230,7 +230,7 @@ const RequisitionForm = () => {
       });
 
       const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF("p", "mm", "a4");
+      const pdf = new jsPDF("p", "mm", "a5");
 
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
@@ -238,7 +238,7 @@ const RequisitionForm = () => {
       const imgHeight = canvas.height;
       const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
       const imgX = (pdfWidth - imgWidth * ratio) / 2;
-      const imgY = 30;
+      const imgY = 5;
 
       pdf.addImage(
         imgData,
@@ -261,7 +261,7 @@ const RequisitionForm = () => {
   const resetForm = () => {
     setFormData({
       projectName: "",
-      jobOrderNo: "", // will regenerate via useEffect
+      jobOrderNo: "",
       jobSiteLocation: "",
       type: "",
     });
@@ -288,7 +288,7 @@ const RequisitionForm = () => {
   };
 
   return (
-    <div id="print-content" className="container mx-auto py-8 px-4 bg-background">
+    <div id="print-content" className="container mx-auto py-4 px-2 bg-background max-w-[148mm]">
       {/* Print Confirmation Modal */}
       {showPrintModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -333,7 +333,6 @@ const RequisitionForm = () => {
                 Cancel
               </Button>
               
-              {/* Only show submit button if no PR/JO conflict */}
               {!submitError.includes("already existing") && (
                 <Button 
                   onClick={submitToFirebase}
@@ -347,26 +346,25 @@ const RequisitionForm = () => {
         </div>
       )}
 
-      <div className="mb-4 flex justify-end"></div>
       <Card className="w-full" ref={formRef}>
-        <CardHeader className="bg-white border-b-2 border-black">
-          <div className="text-center space-y-2">
-            <div className="text-lg font-bold uppercase tracking-wide">
+        <CardHeader className="bg-white border-b-2 border-black py-3">
+          <div className="text-center space-y-1">
+            <div className="text-sm font-bold uppercase tracking-wide">
               CITIMAX GROUP INC.
             </div>
-            <div className="text-sm">ORE CENTRAL TOWER, FORT BONIFACIO TAGUIG CITY.</div>
-            <div className="text-xl font-bold uppercase mt-4">
+            <div className="text-xs">ORE CENTRAL TOWER, FORT BONIFACIO TAGUIG CITY.</div>
+            <div className="text-base font-bold uppercase mt-1">
               PURCHASE REQUISITION
             </div>
           </div>
         </CardHeader>
-        <CardContent className="pt-6">
+        <CardContent className="pt-3">
           <form onSubmit={handleSubmit}>
             {/* Form Header Fields */}
-            <div className="grid grid-cols-12 gap-4 mb-6">
-              <div className="col-span-6">
-                <div className="flex items-center space-x-2">
-                  <Label className="font-semibold min-w-fit">
+            <div className="grid grid-cols-12 gap-2 mb-2">
+              <div className="col-span-8">
+                <div className="flex items-center space-x-1">
+                  <Label className="font-semibold min-w-fit text-xs">
                     Company Name:
                   </Label>
                   <div className="flex-1 border-b border-black">
@@ -374,26 +372,26 @@ const RequisitionForm = () => {
                       name="projectName"
                       value={formData.projectName}
                       onChange={handleInputChange}
-                      className="border-0 border-b border-black rounded-none px-1 py-0 h-6 focus:ring-0 focus:border-black"
+                      className="border-0 border-b border-black rounded-none px-1 py-0 h-5 text-xs"
                       placeholder="Enter company name"
                       required
                     />
                   </div>
                 </div>
               </div>
-              <div className="col-span-3">
-                <div className="flex items-center space-x-2">
-                  <Label className="font-semibold min-w-fit">Date:</Label>
+              <div className="col-span-4">
+                <div className="flex items-center space-x-1">
+                  <Label className="font-semibold min-w-fit text-xs">Date:</Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <div className="flex-1 flex items-center border-b border-black">
                         <Input
                           readOnly
                           value={date ? format(date, "dd-MMM-yyyy") : ""}
-                          className="border-0 rounded-none px-1 py-0 h-6 focus:ring-0 focus:border-black flex-1"
+                          className="border-0 rounded-none px-1 py-0 h-5 text-xs focus:ring-0 focus:border-black flex-1"
                           placeholder="Select date"
                         />
-                        <CalendarIcon className="h-4 w-4 ml-2" />
+                        <CalendarIcon className="h-3 w-3 ml-1" />
                       </div>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
@@ -408,54 +406,37 @@ const RequisitionForm = () => {
                   </Popover>
                 </div>
               </div>
-              <div className="col-span-3">
-                <div className="flex items-center space-x-2">
-                  <Label className="font-semibold min-w-fit">PR/JO No.:</Label>
-                  <div className="flex-1 border-b border-black">
+            </div>
+
+            <div className="grid grid-cols-12 gap-2 mb-2">
+              <div className="col-span-6">
+                <div className="flex items-center space-x-1">
+                  <Label className="font-semibold min-w-fit text-xs">PR/JO No.:</Label>
+                  <div className="flex-1 border-b border-black font-semibold">
                     <Input
                       name="jobOrderNo"
                       value={formData.jobOrderNo}
                       onChange={handleInputChange}
-                      className="border-0 border-b border-black rounded-none px-1 py-0 h-6 focus:ring-0 focus:border-black"
+                      className="border-0 border-b border-black rounded-none px-1 py-0 h-5 text-xs font-bold focus:ring-0 focus:border-black"
                       placeholder="Auto-generated"
                       readOnly
                     />
                   </div>
                 </div>
               </div>
-            </div>
-
-            <div className="grid grid-cols-12 gap-4 mb-6">
               <div className="col-span-6">
-                <div className="flex items-center space-x-2">
-                  <Label className="font-semibold min-w-fit">
-                    Job Site/Location:
-                  </Label>
-                  <div className="flex-1 border-b border-black">
-                    <Input
-                      name="jobSiteLocation"
-                      value={formData.jobSiteLocation}
-                      onChange={handleInputChange}
-                      className="border-0 border-b border-black rounded-none px-1 py-0 h-6 focus:ring-0 focus:border-black"
-                      placeholder="Enter job site/location"
-                      required
-                    />
-                  </div>
-                </div>
-              </div>
-              <div className="col-span-3">
-                <div className="flex items-center space-x-2">
-                  <Label className="font-semibold min-w-fit">Needed:</Label>
+                <div className="flex items-center space-x-1">
+                  <Label className="font-semibold min-w-fit text-xs">Needed:</Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <div className="flex-1 flex items-center border-b border-black">
                         <Input
                           readOnly
                           value={neededDate ? format(neededDate, "dd-MMM-yyyy") : ""}
-                          className="border-0 rounded-none px-1 py-0 h-6 focus:ring-0 focus:border-black flex-1"
+                          className="border-0 rounded-none px-1 py-0 h-5 text-xs focus:ring-0 focus:border-black flex-1"
                           placeholder="Select date"
                         />
-                        <CalendarIcon className="h-4 w-4 ml-2" />
+                        <CalendarIcon className="h-3 w-3 ml-1" />
                       </div>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
@@ -470,181 +451,170 @@ const RequisitionForm = () => {
                   </Popover>
                 </div>
               </div>
-              <div className="col-span-3">
-                <div className="flex items-center space-x-2">
-                  <Label className="font-semibold min-w-fit">Type:</Label>
-                  <div className="flex-1 border-b border-black">
-                    <Input
-                      name="type"
-                      value={formData.type}
-                      onChange={handleInputChange}
-                      className="border-0 border-b border-black rounded-none px-1 py-0 h-6 focus:ring-0 focus:border-black"
-                      placeholder="Enter type"
-                    />
-                  </div>
+            </div>
+
+            <div className="mb-2">
+              <div className="flex items-center space-x-1">
+                <Label className="font-semibold min-w-fit text-xs">
+                  Job Site/Location:
+                </Label>
+                <div className="flex-1 border-b border-black">
+                  <Input
+                    name="jobSiteLocation"
+                    value={formData.jobSiteLocation}
+                    onChange={handleInputChange}
+                    className="border-0 border-b border-black rounded-none px-1 py-0 h-5 text-xs focus:ring-0 focus:border-black"
+                    placeholder="Enter job site/location"
+                    required
+                  />
                 </div>
               </div>
             </div>
 
-            <Separator className="my-8" />
+            <Separator className="my-2" />
 
             {/* Items Section */}
-            <div className="space-y-6">
+            <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <h3 className="text-lg font-medium">Requisition Items</h3>
-                <div className="flex gap-2">
+                <h3 className="text-sm font-medium">Requisition Items</h3>
+                <div className="flex gap-1">
                   <Button
                     onClick={handleAddItem}
                     variant="outline"
-                    className="flex items-center gap-1 print:hidden"
+                    className="flex items-center gap-1 print:hidden px-2 py-1 text-xs"
                     type="button"
                   >
-                    <Plus className="h-4 w-4" />
+                    <Plus className="h-3 w-3" />
                     Add Item
                   </Button>
                   <Button
                     onClick={handleClearAllItems}
                     variant="destructive"
-                    className="flex items-center gap-1 print:hidden"
+                    className="flex items-center gap-1 print:hidden px-2 py-1 text-xs"
                     type="button"
                     disabled={items.length === 0}
                   >
-                    <Trash className="h-4 w-4" />
+                    <Trash className="h-3 w-3" />
                     Clear All
                   </Button>
                 </div>
               </div>
-              <ItemTable 
-                items={items} 
-                onChange={(newItems) => setItems(newItems)} 
-              />
+              <div className="text-xs">
+                <ItemTable 
+                  items={items} 
+                  onChange={(newItems) => setItems(newItems)} 
+                />
+              </div>
             </div>
 
-            <Separator className="my-8" />
+            <Separator className="my-2" />
 
             {/* Approval Section */}
-            <div className="space-y-4">
-              {/* Combined Row: Job Site & Head Office */}
-              <div>
-                <div className="flex w-full">
-                  <div className="w-3/5 text-center font-semibold mb-2">Job Site</div>
-                  <div className="w-2/5 text-center font-semibold mb-2">Head Office</div>
+            <div className="space-y-1">
+              <div className="flex w-full">
+                <div className="w-3/5 text-center font-semibold text-xs">Job Site</div>
+                <div className="w-2/5 text-center font-semibold text-xs">Head Office</div>
+              </div>
+
+              <div className="flex w-full border border-black">
+                <div className="w-1/5 flex flex-col">
+                  <div className="h-6 flex items-center justify-center border-b border-black">
+                    <Label className="text-[14px] font-semibold">Prepared By:</Label>
+                  </div>
+                  <Input
+                    value={approvals.preparedBy}
+                    onChange={(e) => setApprovals(prev => ({ ...prev, preparedBy: e.target.value }))}
+                    className="border-0 rounded-none text-2xs h-8 text-center focus-visible:ring-0"
+                    required
+                  />
                 </div>
 
-                <div className="flex gap-0 w-full">
-                  {/* Job Site - Prepared / Requested By */}
-                  <div className="border border-black p-4 w-1/5">
-                    <div className="flex flex-col">
-                      <Label className="text-sm font-semibold">Prepared / Requested By:</Label>
-                      <Input
-                        value={approvals.preparedBy}
-                        onChange={(e) =>
-                          setApprovals((prev) => ({
-                            ...prev,
-                            preparedBy: e.target.value,
-                          }))
-                        }
-                        className="border-0 border-b border-black rounded-none"
-                        required
-                      />
-                    </div>
+                <div className="w-1/5 flex flex-col border-l border-black">
+                  <div className="h-6 flex items-center justify-center border-b border-black px-1">
+                    <Label className="text-[14px] font-semibold text-center leading-tight">
+                      Reviewed By:
+                    </Label>
                   </div>
 
-                  {/* Job Site - Reviewed By */}
-                  <div className="border border-black p-4 w-1/5">
-                    <div className="flex flex-col">
-                      <Label className="text-sm font-semibold">Reviewed By:</Label>
-                      <Input
-                        value={approvals.jobSiteReviewedBy}
-                        onChange={(e) =>
-                          setApprovals((prev) => ({
-                            ...prev,
-                            jobSiteReviewedBy: e.target.value,
-                          }))
-                        }
-                        className="border-0 border-b border-black rounded-none"
-                      />
-                    </div>
-                  </div>
+                  <Input
+                    value={approvals.jobSiteReviewedBy}
+                    onChange={(e) => setApprovals(prev => ({ ...prev, jobSiteReviewedBy: e.target.value }))}
+                    className="border-0 rounded-none text-2xs h-8 text-center focus-visible:ring-0"
+                  />
+                </div>
 
-                  {/* Job Site - Approved By */}
-                  <div className="border border-black p-4 w-1/5">
-                    <div className="flex flex-col">
-                      <Label className="text-sm font-semibold">Approved By:</Label>
-                      <Input
-                        value={approvals.jobSiteApprovedBy}
-                        onChange={(e) =>
-                          setApprovals((prev) => ({
-                            ...prev,
-                            jobSiteApprovedBy: e.target.value,
-                          }))
-                        }
-                        className="border-0 border-b border-black rounded-none"
-                      />
-                    </div>
+                <div className="w-1/5 flex flex-col border-l border-black">
+                  <div className="h-6 flex items-center justify-center border-b border-black">
+                    <Label className="text-[14px]font-semibold">Noted By:</Label>
                   </div>
+                  <Input
+                    value={approvals.jobSiteApprovedBy}
+                    onChange={(e) => setApprovals(prev => ({ ...prev, jobSiteApprovedBy: e.target.value }))}
+                    className="border-0 rounded-none text-2xs h-8 text-center focus-visible:ring-0"
+                  />
+                </div>
 
-                  {/* Head Office - Reviewed By */}
-                  <div className="border border-black p-4 w-1/5">
-                    <div className="flex flex-col">
-                      <Label className="text-sm font-semibold">Reviewed By:</Label>
-                      <Input
-                        value={approvals.headOfficeReviewedBy}
-                        onChange={(e) =>
-                          setApprovals((prev) => ({
-                            ...prev,
-                            headOfficeReviewedBy: e.target.value,
-                          }))
-                        }
-                        className="border-0 border-b border-black rounded-none"
-                      />
-                    </div>
+                <div className="w-2/5 flex flex-col border-l border-black">
+                  <div className="h-6 flex items-center justify-center border-b border-black">
+                    <Label className="text-[14px] font-semibold">Approved By:</Label>
                   </div>
-
-                  {/* Head Office - Approved By */}
-                  <div className="border border-black p-4 w-1/5">
-                    <div className="flex flex-col">
-                      <Label className="text-sm font-semibold">Approved By:</Label>
-                      <Input
-                        value={approvals.headOfficeApprovedBy}
-                        onChange={(e) =>
-                          setApprovals((prev) => ({
-                            ...prev,
-                            headOfficeApprovedBy: e.target.value,
-                          }))
-                        }
-                        className="border-0 border-b border-black rounded-none"
-                      />
-                    </div>
-                  </div>
+                  <Input
+                    value={approvals.headOfficeApprovedBy}
+                    onChange={(e) => setApprovals(prev => ({ ...prev, headOfficeApprovedBy: e.target.value }))}
+                    className="border-0 rounded-none text-2xs h-8 text-center focus-visible:ring-0"
+                  />
                 </div>
               </div>
 
-              <div className="text-xs text-left">
-                Form No. PRD-{formData.jobOrderNo || 'Form No. Missing'}
+              <div className="text-2xs text-left mt-1">
+                Form No: {formData.jobOrderNo || 'Form No. Missing'}
               </div>
             </div>
+            
+            {/* Logo Footer - Optimized */}
+            <div className="mt-3 flex justify-between items-center gap-0.5">
+              {[1, 2, 3, 4, 5, 6, 7].map((num) => (
+                <div key={num} className="flex-1 flex justify-center">
+                  <img
+                    src={`/logos/logo${num}.jpg`}
+                    alt={`Company Logo ${num}`}
+                    className="object-contain h-8 w-auto mx-auto"
+                  />
+                </div>
+              ))}
+            </div>
 
-            <div className="mt-8 flex justify-end space-x-4 print:hidden">
+            <div className="mt-4 flex justify-end space-x-2 print:hidden">
               <Button 
                 variant="outline" 
                 type="button"
                 disabled={loading || isSubmitting}
                 onClick={resetForm}
+                className="px-2 py-1 text-xs"
               >
                 Reset
+              </Button>
+              {/* Print Button Added Here */}
+              <Button 
+                type="button"
+                onClick={() => window.print()}
+                className="px-2 py-1 text-xs flex items-center gap-1"
+              >
+                <Printer className="h-4 w-4" />
+                Print
               </Button>
               <Button 
                 type="submit"
                 disabled={loading || !isJobOrderReady || isSubmitting}
+                className="px-2 py-1 text-xs"
               >
                 {loading ? "Generating..." : "Submit Requisition"}
               </Button>
             </div>
 
             {success && (
-              <div className="mt-4 p-3 bg-green-100 text-green-700 rounded-md">
-                Requisition submitted successfully! Form ID: {formData.jobOrderNo}
+              <div className="mt-2 p-1 bg-green-100 text-green-700 rounded text-xs">
+                Requisition submitted! ID: {formData.jobOrderNo}
               </div>
             )}
           </form>
